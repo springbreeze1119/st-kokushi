@@ -396,9 +396,17 @@ function pickChara(role, moods = [], topic = ''){
 }
 function charaImg(c){
   if(!c) return `<div class="emoji">✨</div>`;
-  return `<img src="${esc(CHARA_DIR + c.file)}" alt="${esc(c.name)}" data-role="${c.role}" onerror="charaFail(this)">`;
+  return `<img src="${esc(CHARA_DIR + c.file)}" alt="${esc(c.name)}" data-role="${c.role}" data-file="${esc(c.file)}" onerror="charaFail(this)">`;
 }
-function charaFail(img){ const d = document.createElement('div'); d.className = 'emoji'; d.textContent = ROLE_EMOJI[img.dataset.role] || '✨'; img.replaceWith(d); }
+/* 画像が見つからないときの再読み込み。
+   Mac からアップロードすると「ポ」「ブ」などが「ホ＋゜」のように分かれた文字で保存され、
+   GitHub などではファイル名が一致しなくなる。そのため、分かれた書き方（NFD）・まとまった書き方（NFC）の順に試す */
+function charaFail(img){
+  const f = img.dataset.file || '', tried = +(img.dataset.retry || 0);
+  const alts = [f.normalize('NFD'), f.normalize('NFC')].filter(x => x !== f);
+  if(tried < alts.length){ img.dataset.retry = tried + 1; img.src = CHARA_DIR + alts[tried]; return; }
+  const d = document.createElement('div'); d.className = 'emoji'; d.textContent = ROLE_EMOJI[img.dataset.role] || '✨'; img.replaceWith(d);
+}
 
 /* 吹き出し付きで画面下に登場させる */
 const Stage = {
