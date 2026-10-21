@@ -157,7 +157,15 @@ pre.preview{background:#fff;border:2px dashed var(--line);border-radius:12px;pad
 <!-- 問題バンク（同じフォルダの bank.js）。無い場合はデモ問題で動きます -->
 <script src="bank.js" onerror="console.info('bank.js が見つからないためデモ問題で起動します')"></script>
 <!-- 学校ごとの提出先（同じフォルダの school.js）。無い場合は提出ボタンが使えない状態で起動します -->
-<script src="school.js" onerror="console.info('school.js が見つからないため提出先は未設定です')"></script>
+<script>
+/* 提出先の読み込み：URLの末尾に ?s=学校コード があれば schools/学校コード.js を、無ければ school.js を読む
+   例）…/st-kokushi/?s=yanagawa → schools/yanagawa.js */
+(function(){
+  var m = location.search.match(/[?&]s=([A-Za-z0-9_-]+)/);
+  var src = m ? 'schools/' + m[1].toLowerCase() + '.js' : 'school.js';
+  document.write('<script src="' + src + '" onerror="console.info(\'提出先ファイルが見つかりません：' + src + '\')"><\/script>');
+})();
+</script>
 
 <script>
 /* =====================================================================
